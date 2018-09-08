@@ -39,33 +39,34 @@
 (defun paragraph (&key (word-count 50) (prologue t))
   (with-output-to-string (*standard-output*)
     (let ((words-remaining word-count)
-          (words-until-end-of-sentence (+ 2 (random 8)))
+          (words-in-sentence (+ 2 (random 8)))
           (capitalize t))
       (tagbody
        :start
          (cond (prologue
                 (princ *prologue*)
-                (decf words-until-end-of-sentence 3)
+                (decf words-in-sentence 3)
                 (setf capitalize nil))
-               (t (go :output-word)))
-         (setf words-until-end-of-sentence (+ 2 (random 8)))
+               (t
+                (go :output-word)))
        :end-paragraph
          (when (= 0 words-remaining)
            (princ ".")
            (go :end))
        :end-sentence
-         (cond ((= 0 words-until-end-of-sentence)
+         (cond ((= 0 words-in-sentence)
                 (princ ". ")
                 (setf capitalize t
-                      words-until-end-of-sentence (+ 2 (random 8))))
-               (t (if (= 0 (random 8))
-                      (princ ", ")
-                      (princ " "))))
+                      words-in-sentence (+ 2 (random 8))))
+               (t
+                (if (= 0 (random 8))
+                    (princ ", ")
+                    (princ " "))))
        :output-word
          (princ (if capitalize (string-capitalize (word)) (word)))
          (setf capitalize nil)
          (decf words-remaining)
-         (decf words-until-end-of-sentence)
+         (decf words-in-sentence)
        :loop
          (go :end-paragraph)
        :end))))
